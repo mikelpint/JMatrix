@@ -2,15 +2,18 @@ package org.jmatrix.MatrixTypes;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.io.Serializable;
 
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
-import org.jmatrix.MatrixOps.MatrixOps;
 
-public class Matrix implements Vectorizable, MatrixProperties {
+import org.jmatrix.MatrixOps.MatrixOps;
+import org.jmatrix.internals.JMatrixIO;
+
+public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     final public static int maxEntries = 10000;
     
     final static long maxRandomDigits = 50000;
@@ -138,6 +141,11 @@ public class Matrix implements Vectorizable, MatrixProperties {
         return true;
     }
     
+    @Override
+    public String toString () {
+        return JMatrixIO.matrixToString (defaultStyle);
+    }
+    
     public static ArrayList <ArrayList <Apcomplex>> generateEmptyMatrix (int dimension1, int dimension2) {
         ArrayList <ArrayList <Apcomplex>> matrixEntries = new ArrayList <ArrayList <Apcomplex>> ();
         
@@ -224,39 +232,52 @@ public class Matrix implements Vectorizable, MatrixProperties {
     }
     
     @Override
-    public ArrayList <Matrix> submatrices () {
+    public ArrayList <Matrix> principalSubmatrices () {
+        if (this.matrix == null || this.dimension1 <= 1 || this.dimension2 <= 1) {
+            return null;
+        }
+        
         ArrayList <Matrix> submatrices = new ArrayList <Matrix> ();
         
-        HashSet <Integer> rowsToBeDeleted = new HashSet <Integer> ();
-        HashSet <Integer> columnsToBeDeleted = new HashSet <Integer> ();
-
-        for (int delRow = 0; delRow < this.dimension1; delRow++) {
-            rowsToBeDeleted.add (delRow);
-            
-            for (int delColumn = 0; delColumn < this.dimension2; delColumn++) {
-                columnsToBeDeleted.add (delColumn);
-                
-                ArrayList <ArrayList <Apcomplex>> submatrixEntries = new ArrayList <ArrayList <Apcomplex>> ();
-                
-                for (int row = 0; row < this.dimension1; row++) {
-                    if (!rowsToBeDeleted.contains (row)) {
-                        submatrixEntries.add (this.getRow (row));
-                    }
-                    
-                    for (int column = 0; column < this.dimension2; column++) {
-                        for (Integer noColumn : columnsToBeDeleted) {
-                            submatrixEntries.remove ((int) noColumn);
-                        }
-                    }
-                }
-                
-                submatrices.add (new Matrix (this.dimension1 - submatrixEntries.size (), this.dimension2 - submatrixEntries.size (), submatrixEntries));
-                
-                columnsToBeDeleted.clear ();
+        HashSet <int []> deletionSets = new HashSet <int []> ();
+        
+        for (int row = 0; row < this.dimension1; row++) {
+            for (int column = 0; column < this.dimension2; column++) {
+                deletionSets.add (new int [] {row, column});
             }
         }
         
+        for (int [] deletionSet : deletionSets) {
+            ArrayList <ArrayList <Apcomplex>> submatrixEntries = new ArrayList <ArrayList <Apcomplex>> ();
+            
+            for (int row = 0; row < this.dimension1; row++) {
+                if (row != deletionSet [0]) {
+                    submatrixEntries.add (this.getRow (row));
+                }
+            }
+            
+            for (int row = 0; row < submatrixEntries.size (); row++) {
+                submatrixEntries.get (row).remove (deletionSet [1]);
+            }
+            
+            submatrices.add (new Matrix (this.dimension1 - 1, this.dimension2 - 1, submatrixEntries));
+        }
+        
         return submatrices;
+    }
+    
+    public Apcomplex modulus () {
+        if (!(this instanceof Vector) && !(this instanceof RowVector)) {
+            return null;
+        }
+        
+        Apcomplex modulus = Apcomplex.ZERO;
+        
+        for (int element = 0; element < Math.max (this.dimension1, this.dimension2); element++) {
+            modulus = modulus.add (ApcomplexMath.pow (this.getEntry (element), 2));
+        }
+        
+        return ApcomplexMath.sqrt (modulus);
     }
 
     @Override

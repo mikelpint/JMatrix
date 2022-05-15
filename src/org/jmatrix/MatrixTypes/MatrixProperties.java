@@ -6,7 +6,7 @@ public interface MatrixProperties {
     public Matrix transpose ();
     public Matrix transjugate ();
     public Matrix negate ();
-    public ArrayList <Matrix> submatrices ();
+    public ArrayList <Matrix> principalSubmatrices ();
     public boolean isReal ();
     public boolean isInteger ();
     public boolean isSingular ();

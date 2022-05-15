@@ -54,6 +54,16 @@ public class RowVector extends Matrix {
     }
     
     @Override
+    public Vector transpose () {
+        return (Vector) super.transpose ();
+    }
+    
+    @Override
+    public Vector transjugate () {
+        return (Vector) super.transjugate ();
+    }
+    
+    @Override
     public Vector vectorization () {
         return (Vector) this.transpose ();
     }

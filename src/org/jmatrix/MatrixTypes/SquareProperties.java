@@ -7,6 +7,9 @@ import org.apfloat.Apcomplex;
 public interface SquareProperties {
     public ArrayList <Apcomplex> minors ();
     public SquareMatrix inverse ();
+    public boolean isLowerTriangular ();
+    public boolean isUpperTriangular ();
+    public boolean isAntiDiagonal ();
     public boolean isSymmetric ();
     public boolean isAntisymmetric ();
     public boolean isCentrosymmetric ();

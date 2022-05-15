@@ -30,4 +30,27 @@ final public class CommutationMatrix extends SquareMatrix {
     public void setEntry (Apcomplex entry, int... position) {
         return;
     }
+    
+    @Override
+    public boolean isSymmetric () {
+        if (Math.pow ((double) (int) Math.sqrt (this.dimension1), 2) == this.dimension1) {
+            return true;
+        }
+        
+        return super.isSymmetric ();
+    }
+    
+    @Override
+    public boolean isInvolutory () {
+        if (Math.pow ((double) (int) Math.sqrt (this.dimension1), 2) == this.dimension1) {
+            return true;
+        }
+        
+        return super.isInvolutory ();
+    }
+    
+    @Override
+    public boolean isOrthogonal () {
+        return true;
+    }
 }

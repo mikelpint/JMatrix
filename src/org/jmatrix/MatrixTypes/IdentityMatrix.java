@@ -10,4 +10,14 @@ final public class IdentityMatrix extends ScalarMatrix {
     public IdentityMatrix (IdentityMatrix identityMatrix) {
         super (identityMatrix);
     }
+    
+    @Override
+    public boolean isInvolutory () {
+        return true;
+    }
+    
+    @Override
+    public boolean isIdempotent () {
+        return true;
+    }
 }

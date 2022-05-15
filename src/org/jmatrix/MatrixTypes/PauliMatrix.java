@@ -112,4 +112,19 @@ public abstract class PauliMatrix extends SquareMatrix {
     public void setEntry (Apcomplex entry, int... position) {
         return;
     }
+    
+    @Override
+    public boolean isHermitian () {
+        return true;
+    }
+    
+    @Override
+    public boolean isInvolutory () {
+        return true;
+    }
+    
+    @Override
+    public boolean isUnitary () {
+        return true;
+    }
 }

@@ -30,4 +30,9 @@ final public class RedhefferMatrix extends SquareMatrix {
     public void setEntry (Apcomplex entry, int... position) {
         return;
     }
+    
+    @Override
+    public boolean isHollow () {
+        return false;
+    }
 }

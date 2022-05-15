@@ -38,7 +38,32 @@ public class ScalarMatrix extends SquareMatrix {
     }
     
     @Override
+    public boolean isReal () {
+        return true;
+    }
+    
+    @Override
+    public boolean isInteger () {
+        return true;
+    }
+    
+    @Override
     public boolean isSymmetric () {
         return true;
+    }
+    
+    @Override
+    public boolean isDiagonal () {
+        return true;
+    }
+    
+    @Override
+    public boolean isSingular () {
+        return false;
+    }
+    
+    @Override
+    public boolean isHollow () {
+        return false;
     }
 }

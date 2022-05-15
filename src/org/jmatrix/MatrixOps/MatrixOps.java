@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import org.apfloat.Apcomplex;
 import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
+import org.apfloat.Apint;
+import org.apfloat.ApintMath;
+
 import org.jmatrix.MatrixTypes.*;
+import org.jmatrix.internals.*;
 
 public class MatrixOps {
     public static ArrayList <Matrix> splitMatrix (Matrix matrix, int nSplits) {
@@ -169,6 +172,20 @@ public class MatrixOps {
     }
     
     public static SquareMatrix matrixPower (SquareMatrix matrix, int power) {
+        if (matrix instanceof IdentityMatrix) {
+            return matrix;
+        }
+    
+        if (matrix instanceof ExchangeMatrix) {
+            if (power % 2 == 0) {
+                return matrix;
+            }
+            
+            else {
+                return new IdentityMatrix (matrix.getDimension1 ());
+            }
+        }
+        
         SquareMatrix originalMatrix = new SquareMatrix (matrix);
         
         if (power == 0) {
@@ -236,11 +253,16 @@ public class MatrixOps {
     }
     
     public static int calculateRank (Matrix matrix, OpList opList) {   
-        if (matrix instanceof ZeroMatrix) {
+        if (matrix instanceof ZeroMatrix || matrix.equals (new ZeroMatrix (matrix.getDimension1 (), matrix.getDimension2 ()))) {
             return 0;
         }
         
-        if (matrix instanceof ScalarMatrix) {
+        if (
+            matrix instanceof ScalarMatrix ||
+            matrix instanceof ExchangeMatrix ||
+            matrix instanceof HilbertMatrix ||
+            matrix instanceof CommutationMatrix
+        ) {
             return matrix.getDimension1 ();
         }
         
@@ -276,8 +298,26 @@ public class MatrixOps {
     }
     
     public static Apcomplex calculateTrace (SquareMatrix matrix) {
-        if (matrix instanceof ShiftMatrix) {
+        if (matrix instanceof ShiftMatrix || (Matrix) matrix instanceof ZeroMatrix || matrix.equals (new ZeroMatrix (matrix.getDimension1 (), matrix.getDimension1 ()))) {
             return Apcomplex.ZERO;
+        }
+        
+        if (matrix instanceof PascalMatrix.SymmetricPascalMatrix) {
+            Apint trace = Apint.ZERO;
+            
+            for (int k  = 0; k <= matrix.getDimension1 () - 1; k++) {
+                trace = trace.add (
+                    ApintMath.factorial (2 * k).divide (
+                        ApintMath.pow (ApintMath.factorial (k), 2)
+                    )
+                );
+            }
+            
+            return (Apcomplex) trace;
+        }
+        
+        if (matrix instanceof LehmerMatrix || matrix instanceof PascalMatrix.LowerPascalMatrix || matrix instanceof PascalMatrix.UpperPascalMatrix) {
+            return new Apcomplex (new Apfloat (matrix.getDimension1 ()));
         }
         
         if (matrix instanceof ScalarMatrix) {
@@ -286,6 +326,10 @@ public class MatrixOps {
             }
             
             return matrix.getEntry (0, 0).multiply ((Apcomplex) new Apfloat (matrix.getDimension1 ()));
+        }
+        
+        if (matrix instanceof ExchangeMatrix) {
+            return (Apcomplex) new Apint (matrix.getDimension1 () % 2);
         }
         
         Apcomplex result = Apcomplex.ZERO;
@@ -302,6 +346,10 @@ public class MatrixOps {
             return Apcomplex.ZERO;
         }
         
+        if (matrix instanceof PascalMatrix) {
+            return Apcomplex.ONE;
+        }
+        
         if (matrix instanceof ScalarMatrix) {
             if (matrix instanceof IdentityMatrix) {
                 return Apcomplex.ONE;
@@ -311,21 +359,21 @@ public class MatrixOps {
         }
         
         if (matrix instanceof HilbertMatrix) {
-            Apcomplex determinantReciprocal = ApcomplexMath.gamma ((Apcomplex) new Apfloat (matrix.getDimension1 ()));
+            Apint determinantReciprocal = ApintMath.factorial (matrix.getDimension1 ());
             
             for (int i = 1; i < (2 * matrix.getDimension1 ()); i++) {
-                determinantReciprocal = determinantReciprocal.multiply (
-                    (Apcomplex) ApfloatMath.gamma (new Apfloat (i))).divide (
-                        ApfloatMath.gamma (new Apfloat (i / 2).truncate ().multiply (
-                            ApfloatMath.gamma (new Apfloat (i).subtract (
-                                new Apfloat (i / 2).truncate ())
-                            )
-                        )
-                    )
-                );
+                determinantReciprocal = determinantReciprocal.multiply (JMath.binomialCoefficient (i, i / 2));
             }
             
-            return ApcomplexMath.pow (determinantReciprocal, -1);
+            return ApcomplexMath.pow ((Apcomplex) determinantReciprocal, -1);
+        }
+        
+        if (matrix instanceof ExchangeMatrix) {
+            return (Apcomplex) ApintMath.pow (Apint.ONE.negate (), (matrix.getDimension1 () * (matrix.getDimension1 () - 1) / 2));
+        }
+        
+        if (matrix instanceof RedhefferMatrix) {
+            return (Apcomplex) JMath.mertens (matrix.getDimension1 ());
         }
         
         OpList opList = new OpList ();
@@ -371,8 +419,34 @@ public class MatrixOps {
             return new ScalarMatrix (matrix.getDimension1 (), ApcomplexMath.pow (matrix.getEntry (0, 0), -1));
         }
         
-        if (matrix instanceof CommutationMatrix) {
+        if (matrix instanceof CommutationMatrix || matrix instanceof ExchangeMatrix) {
             return matrix;
+        }
+        
+        if (matrix instanceof HilbertMatrix) {
+            int n = matrix.getDimension1 ();
+            
+            SquareMatrix inverseMatrix = new SquareMatrix (n);
+            
+            for (int row = 0; row <= n; row++) {
+                for (int column = 0; column <= n; column++) {
+                    inverseMatrix.setEntry (
+                        (Apcomplex) ApintMath.pow (Apint.ONE.negate (), row + column + 2).multiply (
+                            new Apint (row + column + 1).multiply (
+                                JMath.binomialCoefficient (n + row, n - column - 1)
+                            ).multiply (
+                                JMath.binomialCoefficient (n + column, n - row - 1)
+                            ).multiply (
+                                ApintMath.pow (JMath.binomialCoefficient (row + column, row), 2)
+                            )
+                        ),
+                        row,
+                        column
+                    );
+                }
+            }
+            
+            return inverseMatrix;
         }
         
         OpList opList = new OpList ();

@@ -39,14 +39,10 @@ public class SquareMatrix extends Matrix implements SquareProperties {
     public ArrayList <Apcomplex> minors () {
         ArrayList <Apcomplex> minors = new ArrayList <Apcomplex> ();
         
-        ArrayList <Matrix> submatrices = this.submatrices ();
+        ArrayList <Matrix> submatrices = this.principalSubmatrices ();
         
-        for (int submatrix = 0; submatrix < submatrices.size (); submatrix++) {
-            if (submatrices.get (submatrix).dimension1 != this.dimension1 - 1 && submatrices.get (submatrix).dimension2 != this.dimension1) {
-                break;
-            }
-            
-            minors.add (MatrixOps.calculateDeterminant ((SquareMatrix) submatrices.get (submatrix)));
+        for (Matrix submatrix : submatrices) {
+            minors.add (MatrixOps.calculateDeterminant ((SquareMatrix) submatrix));
         }
         
         return minors;
@@ -55,6 +51,29 @@ public class SquareMatrix extends Matrix implements SquareProperties {
     @Override
     public SquareMatrix inverse () {
         return MatrixOps.invertMatrix (this);
+    }
+    
+    @Override
+    public boolean isLowerTriangular () {
+        return this.transpose ().isUpperTriangular ();
+    }
+    
+    @Override
+    public boolean isUpperTriangular () {
+        return (this.isSingular () && this.isRowEchelon ());
+    }
+    
+    @Override
+    public boolean isAntiDiagonal () {
+        for (int row = 0; row < this.dimension1; row++) {
+            for (int column = 0; column < this.dimension1; column++) {
+                if (row + column != this.dimension1 - 1 && !this.getEntry (row, column).equals (Apcomplex.ZERO)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
     
     @Override

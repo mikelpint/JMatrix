@@ -32,4 +32,9 @@ final public class LehmerMatrix extends SquareMatrix {
     public void setEntry (Apcomplex entry, int... position) {
         return;
     }
+    
+    @Override
+    public boolean isSymmetric () {
+        return true;
+    }
 }

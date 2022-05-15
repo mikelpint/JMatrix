@@ -43,6 +43,11 @@ final public class ExchangeMatrix extends SquareMatrix {
     }
     
     @Override
+    public boolean isAntiDiagonal () {
+        return true;
+    }
+    
+    @Override
     public boolean isInvolutory () {
         return true;
     }

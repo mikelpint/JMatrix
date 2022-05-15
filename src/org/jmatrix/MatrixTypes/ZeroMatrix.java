@@ -22,4 +22,9 @@ public class ZeroMatrix extends Matrix {
     public void setEntry (Apcomplex entry, int... position) {
         return;
     }
+    
+    @Override
+    public boolean isDiagonal () {
+        return true;
+    }
 }
