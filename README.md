@@ -11,6 +11,8 @@ Además, no he cumplido lo de los mapas y ArrayList en la clase contenedora porq
 Siento haber entregado un proyecto tan tarde y con tan mala calidad pero es que Java (sobre todo Swing) me desespera y ya llega un punto en el que no puedo arreglar tantos fallos que en muchos casos ya no dependen tanto de mí sino del lenguaje que estoy usando.
 
 ## Manual de uso
+Para ejecutar el programa debes ejecutar el archivo MainWindow.java que se encuentra en el paquete org.jmatrix.graphical de la carpeta src.
+
 El funcionamiento del programa es muy simple: tiene dos botones, uno que sirve para cargar una matriz serializada en un archivo y otro que sirve para generar una matriz.
 
 Cargar una matriz no tiene mucho misterio, se pulsa el botón y se carga el archivo deseado.
