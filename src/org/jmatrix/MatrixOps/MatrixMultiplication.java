@@ -8,22 +8,32 @@ import org.jmatrix.MatrixTypes.*;
 
 public class MatrixMultiplication {
     public static Matrix naiveMatrixMultiplication (Matrix matrixA, Matrix matrixB) {
-        ArrayList <ArrayList <Apcomplex>> matrixCEntries = Matrix.generateEmptyMatrix (matrixA.getDimension1 (), matrixB.getDimension2 ());
+        Matrix matrixC = new Matrix (matrixA.getDimension1 (), matrixB.getDimension2 ());
         
         for (int i = 0; i < matrixA.getDimension1 (); i++) {
-            for (int j = 0; j < matrixA.getDimension2 (); j++) {
+            for (int j = 0; j < matrixB.getDimension2 (); j++) {
                 Apcomplex entry = Apcomplex.ZERO;
                 
-                for (int k = 0; k < matrixB.getDimension2 (); k++) {
-                    Apcomplex product = matrixA.getMatrix ().get (i).get (k).multiply (matrixB.getMatrix ().get (k).get (j));
-                    entry = entry.add (product);
+                for (int k = 0; k < matrixA.getDimension2 (); k++) {
+                    entry = entry.add (matrixA.getEntry (i, k).multiply (matrixB.getEntry (k, j)));
                 }
                 
-                matrixCEntries.get (i).set (j, entry);
+                matrixC.setEntry (entry, i, j);
             }
         }
         
-        return new Matrix (matrixA.getDimension1 (), matrixA.getDimension2 (), matrixCEntries);
+        return (matrixC.getDimension1 () == matrixC.getDimension2 ()) 
+            ? new SquareMatrix (matrixC.getDimension1 (), matrixC.getMatrix ())
+            : (
+                (matrixC.getDimension2 () == 1)
+                ? new Vector (matrixC.getDimension1 (), matrixC.getMatrix ())
+                : (
+                    (matrixC.getDimension1 () == 1)
+                    ? new RowVector (matrixC.getDimension2 (), matrixC.getMatrix ())
+                    : matrixC
+                )
+            )
+        ;
     }
     
     public static Matrix strassenMatrixMultiplication (Matrix matrixA, Matrix matrixB) {

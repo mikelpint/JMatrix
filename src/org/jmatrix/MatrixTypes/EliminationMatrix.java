@@ -1,8 +1,11 @@
 package org.jmatrix.MatrixTypes;
 
+import java.util.ArrayList;
+
+import org.apfloat.Apcomplex;
 import org.jmatrix.MatrixOps.MatrixOps;
 
-final public class EliminationMatrix extends Matrix {
+public final class EliminationMatrix extends Matrix {
     public EliminationMatrix (int dimension1) {
         super ((dimension1 * (dimension1 + 1)) / 2, dimension1 * dimension1);
         
@@ -20,9 +23,13 @@ final public class EliminationMatrix extends Matrix {
                                 new CanonicalVector (dimension1, row)
                             )
                         )
-                    ).getMatrix ()
+                    ).matrix
                 );
             }
         }
+    }
+    
+    public EliminationMatrix (EliminationMatrix eliminationMatrix) {
+        super (eliminationMatrix);
     }
 }

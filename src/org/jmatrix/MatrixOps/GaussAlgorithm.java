@@ -10,7 +10,7 @@ import org.jmatrix.MatrixTypes.Matrix;
 public class GaussAlgorithm {
     public static void rowByFactor (Matrix matrix, int row, Apcomplex factor) {
         for (int column = 0; column < matrix.getDimension2 (); column++) {
-            matrix.setEntry (matrix.getEntry (row, column).multiply (factor), row, column);
+            matrix.setEntry (matrix.getEntry (row, column).precision (Matrix.NUMBER_PRECISION).multiply (factor.precision (Matrix.NUMBER_PRECISION)), row, column);
         }
     }
     
@@ -49,7 +49,7 @@ public class GaussAlgorithm {
         }
         
         if (!rEMatrix.isRowEchelon ()) {
-            rowEchelonMatrix (matrix, opList);
+            rowEchelonMatrix (rEMatrix, opList);
         }
         
         return rEMatrix;
@@ -86,7 +86,7 @@ public class GaussAlgorithm {
             return;
         }
         
-        Apcomplex factor = matrix.getEntry (row1, pivot).divide (matrix.getEntry (row2, pivot));
+        Apcomplex factor = (matrix.getEntry (row1, pivot).precision (Matrix.NUMBER_PRECISION).divide (matrix.getEntry (row2, pivot).precision (Matrix.NUMBER_PRECISION))).precision (Matrix.NUMBER_PRECISION);
         
         subtractRows (matrix, row1, row2, factor);
         
@@ -96,7 +96,7 @@ public class GaussAlgorithm {
     }
     
     public static void divideByPivot (Matrix matrix, int row, OpList opList) {
-        Apcomplex pivot = matrix.getEntry (row, countZerosRow (matrix, row));
+        Apcomplex pivot = matrix.getEntry (row, countZerosRow (matrix, row)).precision (Matrix.NUMBER_PRECISION);
         
         if (pivot.equals (Apcomplex.ZERO) || pivot.equals (Apcomplex.ONE)) {
             return;
@@ -157,7 +157,7 @@ public class GaussAlgorithm {
         int biggestRow = 0;
         
         for (int row = 1; row < matrix.getDimension1 (); row++) {
-            if (ApcomplexMath.abs (matrix.getEntry (row, 0)).compareTo (ApcomplexMath.abs (matrix.getEntry (biggestRow, 0))) == 1) {
+            if (ApcomplexMath.abs (matrix.getEntry (row, 0).precision (Matrix.NUMBER_PRECISION)).precision (Matrix.NUMBER_PRECISION).compareTo (ApcomplexMath.abs (matrix.getEntry (biggestRow, 0).precision (Matrix.NUMBER_PRECISION))) == 1) {
                 biggestRow = row;
             }
         }

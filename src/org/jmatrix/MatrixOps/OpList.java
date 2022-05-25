@@ -10,7 +10,7 @@ public class OpList {
     static protected abstract class Op {
         abstract void apply (Matrix matrix);
         
-        static protected class MultOp extends Op {
+        protected static class MultOp extends Op {
             protected int row;
             protected Apcomplex factor;
             
@@ -33,7 +33,7 @@ public class OpList {
             }
             
             protected void setRow (int row) {
-                if (row < 0 && row > Matrix.maxEntries) {
+                if (row < 0 && row > Matrix.MAX_ENTRIES) {
                     return;
                 }
                 
@@ -58,7 +58,7 @@ public class OpList {
         }
         
         
-        static protected class SwapOp extends Op {
+        protected static class SwapOp extends Op {
             protected int row1;
             protected int row2;
             
@@ -81,7 +81,7 @@ public class OpList {
             }
             
             protected void setRow1 (int row) {
-                if (row < 0 || row > Matrix.maxEntries) {
+                if (row < 0 || row > Matrix.MAX_ENTRIES) {
                     return;
                 }
                 
@@ -93,7 +93,7 @@ public class OpList {
             }
             
             protected void setRow2 (int row) {
-                if (row < 0 || row > Matrix.maxEntries) {
+                if (row < 0 || row > Matrix.MAX_ENTRIES) {
                     return;
                 }
                 
@@ -105,7 +105,7 @@ public class OpList {
             }
         }
         
-        static protected class SubOp extends Op {
+        protected static class SubOp extends Op {
             protected int row1;
             protected int row2;
             protected Apcomplex factor;
@@ -131,7 +131,7 @@ public class OpList {
             }
             
             protected void setRow1 (int row) {
-                if (row < 0 || row > Matrix.maxEntries) {
+                if (row < 0 || row > Matrix.MAX_ENTRIES) {
                     return;
                 }
                 
@@ -143,7 +143,7 @@ public class OpList {
             }
             
             protected void setRow2 (int row) {
-                if (row < 0 || row > Matrix.maxEntries) {
+                if (row < 0 || row > Matrix.MAX_ENTRIES) {
                     return;
                 }
                 

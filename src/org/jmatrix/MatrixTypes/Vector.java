@@ -1,11 +1,12 @@
 package org.jmatrix.MatrixTypes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apfloat.Apcomplex;
 
 public class Vector extends Matrix {
-    Matrix originalMatrix;
+    protected Matrix originalMatrix;
     
     public Vector (int nElements) {
         super (nElements, 1);
@@ -37,8 +38,13 @@ public class Vector extends Matrix {
     }
     
     @Override
-    public void setDimension2 (int dimension2) {
-        return;
+    public Apcomplex getEntry (int... element) {
+        return super.getEntry (element [0], 0);
+    }
+    
+    @Override
+    public void setEntry (Apcomplex entry, int... element) {
+        super.setEntry (entry, element [0], 0);
     }
     
     public Matrix getOriginalMatrix () {
@@ -49,24 +55,16 @@ public class Vector extends Matrix {
         this.originalMatrix = matrix;
     }
     
-    @Override
-    public Apcomplex getEntry (int... element) {
-        return super.getEntry (0, element [0]);
-    }
-    
-    @Override
-    public void setEntry (Apcomplex entry, int... element) {
-        super.setEntry (entry, 0, element [0]);
-    }
-    
+    // No sé por qué no va
     @Override
     public RowVector transpose () {
-        return (RowVector) super.transpose ();
+//        return new RowVector (this.dimension1, super.transpose ().matrix);
+        return null;
     }
     
     @Override
     public RowVector transjugate () {
-        return (RowVector) super.transjugate ();
+        return new RowVector (this.dimension1, super.transjugate ().matrix);
     }
     
     @Override

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import org.apfloat.Apcomplex;
 
 public class RowVector extends Matrix {
-    Matrix originalMatrix;
+    protected Matrix originalMatrix;
     
     public RowVector (int nElements) {
         super (1, nElements);
@@ -30,11 +30,6 @@ public class RowVector extends Matrix {
         return 1;
     }
     
-    @Override
-    public void setDimension1 (int dimension1) {
-        return;
-    }
-    
     public Matrix getOriginalMatrix () {
         return this.originalMatrix;
     }
@@ -50,22 +45,24 @@ public class RowVector extends Matrix {
     
     @Override
     public void setEntry (Apcomplex entry, int... element) {
-        super.setEntry (entry, 0, element [0]);
+        this.setEntry (entry, 0, element [0]);
     }
     
+    // No sé por qué no va
     @Override
     public Vector transpose () {
-        return (Vector) super.transpose ();
+//        return new Vector (this.dimension2, super.transpose ().matrix);
+        return null;
     }
     
     @Override
     public Vector transjugate () {
-        return (Vector) super.transjugate ();
+        return new Vector (this.dimension2, super.transjugate ().matrix);
     }
     
     @Override
     public Vector vectorization () {
-        return (Vector) this.transpose ();
+        return this.transpose ();
     }
     
     @Override

@@ -1,4 +1,4 @@
-package org.jmatrix.internals;
+package org.jmatrix.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import org.apfloat.Apcomplex;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 
-import org.jmatrix.MatrixTypes.Matrix;
+import org.jmatrix.MatrixTypes.*;
 
 public class JMatrixIO {
     public enum Styles {
@@ -23,6 +23,10 @@ public class JMatrixIO {
     }
     
     public static String numberToString (Apcomplex number) {
+        if (number == null) {
+            return null;
+        }
+        
         if (number.equals (Apcomplex.ZERO)) {
             return "0";
         }
@@ -33,7 +37,7 @@ public class JMatrixIO {
         String numberString = ((realPart.signum () == -1) ? "-" : "") + ((ApfloatMath.abs (realPart).equals (Apfloat.ZERO)) ? "" : ApfloatMath.abs (realPart).toString (true));
         
         if (!imagPart.equals (Apfloat.ZERO)) {
-           String imagString = null;
+           String imagString = "";
             
            if (!ApfloatMath.abs (imagPart).equals (Apfloat.ONE)) {
                imagString = ApfloatMath.abs (imagPart).toString (true);
@@ -58,7 +62,11 @@ public class JMatrixIO {
     }
     
     public static String matrixToString (Matrix matrix, Styles style) {
-        String matrixString = null;
+        if (matrix == null || style == null) {
+            return null;
+        }
+        
+        String matrixString = "";
         
         if (style == Styles.LIST || style == Styles.ARRAY) {
             char leftEncapsulationChar;
@@ -119,6 +127,7 @@ public class JMatrixIO {
                         "%s%-*s%s",
                         String.format (
                             "%-*s = ",
+                            positionLength,
                             String.format (
                                 "[%d][%d]",
                                 row + 1,
@@ -207,7 +216,7 @@ public class JMatrixIO {
                 delimiterGroup = 3;
             }
             
-            else {
+            else if (style == Styles.DOUBLEPIPES) {
                delimiterGroup = 4; 
             }
             
@@ -232,15 +241,13 @@ public class JMatrixIO {
                         
                         else if (row == matrix.getDimension1 () - 1) {
                             if (delimiterGroup == 1) {
-                                if (delimiterGroup == 1) {
                                     rowDelimiters [0] = 10;
                                     rowDelimiters [1] = 11;
-                                }
+                            }
 
-                                else {
-                                    rowDelimiters [0] = 4;
-                                    rowDelimiters [1] = 5;
-                                }
+                            else {
+                                rowDelimiters [0] = 4;
+                                rowDelimiters [1] = 5;
                             }
                         }
                         
@@ -281,46 +288,150 @@ public class JMatrixIO {
                 matrixString += delimiters.get (delimiterGroup).get (rowDelimiters [1]) + ((row < matrix.getDimension1 () - 1) ? '$' : "");
             }
             
-            String newMatrixString = null;
+            String newMatrixString = "";
             
             ArrayList <String> rowStrings = new ArrayList <String> ();
             
-            StringTokenizer rowTokens = new StringTokenizer (matrixString, "$");
-            
-            while (rowTokens.hasMoreTokens ()) {
-                rowStrings.add (rowTokens.nextToken ());
-            }
+            for (StringTokenizer rowTokens = new StringTokenizer (matrixString, "$"); rowTokens.hasMoreTokens (); rowStrings.add (rowTokens.nextToken ())) {}
             
             ArrayList <ArrayList <String>> elementStrings = new ArrayList <ArrayList <String>> ();
             int largestStringLength = 0;
             
             for (int row = 0; row < matrix.getDimension1 (); row++) {
                 elementStrings.add (new ArrayList <String> ());
-                StringTokenizer elementTokens = new StringTokenizer (rowStrings.get (row), "_");
+                int currentStringLength;
                 
-                while (elementTokens.hasMoreTokens ()) {
+                for (
+                    StringTokenizer elementTokens = new StringTokenizer (rowStrings.get (row), "_");
+                    elementTokens.hasMoreTokens ();
+                    largestStringLength = (currentStringLength > largestStringLength) ? currentStringLength : largestStringLength
+                ) {
                     String elementString = elementTokens.nextToken ();
                     elementStrings.get (row).add (elementString);
                     
-                    int currentStringLength =
+                    currentStringLength =
                         elementString.length () -
                         (
                             (
                                 matrix.getDimension2 () - elementTokens.countTokens () == 0 ||
                                 matrix.getDimension2 () - elementTokens.countTokens () == matrix.getDimension2 () - 1
-                            ) 
-                                ? (
-                                    (style == Styles.DOUBLEPIPES)
-                                        ? 2
-                                        : 1
-                                    ) 
-                                : 0
+                            )
+                            ? (
+                                (style == Styles.DOUBLEPIPES)
+                                    ? 2
+                                    : 1
+                            )
+                            : 0
                         )
                     ;
                 }
             }
+            
+            for (int row = 0; row < matrix.getDimension1 (); row++) {
+                for (int column = 0; column < matrix.getDimension2 (); column++) {
+                    String newElementString = "";
+                    
+                    if ((matrix.getDimension2 () & 1) == 1) {
+                        if (column + 1 < (int) (matrix.getDimension2 () / 2) + 1) {
+                            newElementString =
+                                String.format ("%-" + largestStringLength + "s", elementStrings.get (row).get (column)) +
+                                ((column + 1 < (int) (matrix.getDimension2 () / 2)) ? "   " : "")
+                            ;
+                        }
+                    
+                        else if (column + 1 == (int) (matrix.getDimension2 () / 2) + 1) {
+                            int lengthDiff = largestStringLength - elementStrings.get (row).get (column).length ();
+                            
+                            for (
+                                int spaces = ((lengthDiff & 1) == 1) ? (lengthDiff / 2) + 1 : (lengthDiff / 2);
+                                spaces > 0;
+                                spaces--
+                            ) {
+                                newElementString += ' ';
+                            }
+                            
+                            newElementString += elementStrings.get (row).get (column);
+                            
+                            for (
+                                int spaces = lengthDiff / 2;
+                                spaces > 0;
+                                spaces--
+                            ) {
+                                newElementString += ' ';
+                            }
+                        }
+                        
+                        else {
+                            newElementString =
+                                String.format ("%" + largestStringLength + "s", elementStrings.get (row).get (column)) +
+                                ((column + 1 < matrix.getDimension2 ()) ? "   " : "")
+                            ;
+                        }
+                    }
+                
+                    else {
+                        if (column + 1 <= matrix.getDimension2 () / 2) {
+                            newElementString =
+                                String.format ("%-" + largestStringLength + "s", elementStrings.get (row).get (column)) +
+                                ((column + 1 < matrix.getDimension2 ()) ? "   " : "")
+                            ;
+                        }
+                        
+                        else {
+                            newElementString =
+                                String.format ("%" + largestStringLength + "s", elementStrings.get (row).get (column)) +
+                                ((column + 1 < matrix.getDimension2 ()) ? "   " : "")
+                            ;
+                        }
+                    }
+                    
+                    newMatrixString += newElementString;
+                    
+                    if (column == matrix.getDimension2 () - 1) {
+                        newMatrixString += "\n";
+                    }
+                }
+            }
+            
+            matrixString = newMatrixString;
         }
         
         return matrixString;
+    }
+    
+    public static Apcomplex parseNumber (String numberString) {
+        if (numberString == null) {
+            return null;
+        }
+        
+        for (int i = 0; i < numberString.length (); i++) {
+            if (
+                (numberString.charAt (i) == '(' && i != 0) ||
+                (numberString.charAt (i) == ')' && i != numberString.length () - 1)
+            ) {
+                return null;
+            }
+        }
+        
+        numberString = numberString.replaceFirst ("(", "").replaceFirst (")", "").replaceAll (" ", "");
+        
+        String [] numberPartsString = numberString.split (",");
+        
+        if (numberPartsString.length != 2) {
+            return null;
+        }
+        
+        Apfloat [] numberPartsApfloat = {null, null};
+        
+        try {
+            numberPartsApfloat [0] = new Apfloat (numberPartsString [0]);
+            numberPartsApfloat [1] = new Apfloat (numberPartsString [1]);
+        }
+        
+        catch (NumberFormatException e) {
+            return null;
+        }
+        
+        return new Apcomplex (numberPartsApfloat [0], numberPartsApfloat [1]);
     }
 }

@@ -1,4 +1,4 @@
-package org.jmatrix.internals;
+package org.jmatrix.internal;
 
 import java.util.ArrayList;
 

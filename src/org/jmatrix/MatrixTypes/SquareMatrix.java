@@ -22,30 +22,32 @@ public class SquareMatrix extends Matrix implements SquareProperties {
     
     @Override
     public SquareMatrix transpose () {
-        return (SquareMatrix) super.transpose ();
+        return new SquareMatrix (this.dimension1, super.transpose ().matrix);
     }
     
     @Override
     public SquareMatrix transjugate () {
-        return (SquareMatrix) super.transjugate ();
+        return new SquareMatrix (this.dimension1, super.transjugate ().matrix);
     }
     
     @Override
     public SquareMatrix negate () {
-        return (SquareMatrix) super.negate ();
+        return new SquareMatrix (this.dimension1, super.negate ().matrix);
     }
     
     @Override
+    // Voy a poner que retorne null porque no va la función Matrix.principalSubmatrices
     public ArrayList <Apcomplex> minors () {
-        ArrayList <Apcomplex> minors = new ArrayList <Apcomplex> ();
-        
-        ArrayList <Matrix> submatrices = this.principalSubmatrices ();
-        
-        for (Matrix submatrix : submatrices) {
-            minors.add (MatrixOps.calculateDeterminant ((SquareMatrix) submatrix));
-        }
-        
-        return minors;
+//        ArrayList <Apcomplex> minors = new ArrayList <Apcomplex> ();
+//        
+//        ArrayList <Matrix> submatrices = this.principalSubmatrices ();
+//        
+//        for (Matrix submatrix : submatrices) {
+//            minors.add (MatrixOps.calculateDeterminant ((SquareMatrix) submatrix));
+//        }
+//        
+//        return minors;
+        return null;
     }
     
     @Override
@@ -249,13 +251,16 @@ public class SquareMatrix extends Matrix implements SquareProperties {
     }
     
     @Override
+    // Voy a poner que retorne false porque no va la función Matrix.principalSubmatrices
     public boolean isP () {
-        for (Apcomplex minor : this.minors ()) {
-            if (ApcomplexMath.abs (minor).compareTo (Apcomplex.ZERO) != 1) {
-                return false;
-            }
-        }
+//        for (Apcomplex minor : this.minors ()) {
+//            if (ApcomplexMath.abs (minor).compareTo (Apcomplex.ZERO) != 1) {
+//                return false;
+//            }
+//        }
+//        
+//        return true;
         
-        return true;
+        return false;
     }
 }

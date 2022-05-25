@@ -14,16 +14,6 @@ public class ZeroMatrix extends Matrix {
     }
     
     @Override
-    public void setMatrix (ArrayList <ArrayList <Apcomplex>> matrix) {
-        return;
-    }
-    
-    @Override
-    public void setEntry (Apcomplex entry, int... position) {
-        return;
-    }
-    
-    @Override
     public boolean isDiagonal () {
         return true;
     }

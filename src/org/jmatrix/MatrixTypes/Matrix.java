@@ -9,19 +9,25 @@ import org.apfloat.ApcomplexMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 import org.apfloat.Apint;
-
+import org.apfloat.ApintMath;
 import org.jmatrix.MatrixOps.MatrixOps;
-import org.jmatrix.internals.JMatrixIO;
+import org.jmatrix.internal.JMatrixIO;
+import org.jmatrix.internal.Settings;
+import org.jmatrix.internal.JMatrixIO.Styles;
 
 public class Matrix implements Vectorizable, MatrixProperties, Serializable {
-    final public static int maxEntries = 10000;
+    private static final long serialVersionUID = 1L;
     
-    final static long maxRandomDigits = 50000;
-    final static Apint maxRange = new Apint (maxRandomDigits, 2);
+    public static final int MAX_ENTRIES = 10000;
+    
+    public static final long NUMBER_PRECISION = 1000;
+    
+    public static final long MAX_RANDOM_DIGITS = 50000;
+    public static final Apint MAX_RANGE = new Apint (MAX_RANDOM_DIGITS, 2);
     
     protected int dimension1;
     protected int dimension2;
-    protected ArrayList <ArrayList <Apcomplex>> matrix = new ArrayList <ArrayList <Apcomplex>> ();
+    protected ArrayList <ArrayList <Apcomplex>> matrix;
     
     public Matrix (int dimension1, int dimension2) {
         super ();
@@ -42,9 +48,9 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     public Matrix (Matrix matrix) {
         super ();
         
-        this.dimension1 = matrix.getDimension1 ();
-        this.dimension2 = matrix.getDimension2 ();
-        this.matrix = matrix.getMatrix ();
+        this.dimension1 = matrix.dimension1;
+        this.dimension2 = matrix.dimension2;
+        this.setMatrix (matrix.matrix);
     }
 
     public int getDimension1 () {
@@ -52,7 +58,7 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     }
 
     public void setDimension1 (int dimension1) {
-        if (dimension1 > 0 && dimension1 <= maxEntries) {
+        if (dimension1 > 0 && dimension1 <= MAX_ENTRIES) {
             this.dimension1 = dimension1;
         }
         
@@ -66,7 +72,7 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     }
 
     public void setDimension2 (int dimension2) {
-        if (dimension2 > 0 && dimension2 <= maxEntries) {
+        if (dimension2 > 0 && dimension2 <= MAX_ENTRIES) {
             this.dimension2 = dimension2;
         }
         
@@ -90,7 +96,15 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
             }
         }
         
-        this.matrix = matrix;
+        this.matrix = new ArrayList <ArrayList <Apcomplex>> ();
+        
+        for (int row = 0; row < matrix.size (); row++) {
+            this.matrix.add (new ArrayList <Apcomplex> ());
+            
+            for (int column = 0; column < matrix.get (0).size (); column++) {
+                this.matrix.get (row).add (matrix.get (row).get (column));
+            }
+        }
     }
     
     public ArrayList <Apcomplex> getRow (int row) {
@@ -106,11 +120,13 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
             return;
         }
         
-        this.matrix.set (rowIndex, row);
+        for (int column = 0; column < row.size (); column++) {
+            this.matrix.get (rowIndex).set (column, row.get (column));
+        }
     }
     
     public Apcomplex getEntry (int... position) {
-        if (position.length != 2 || position [0] < 0 || position [0] >= this.dimension1 || position [1]  < 0 || position [1] >= this.dimension1) {
+        if (position [0] < 0 || position [0] >= this.dimension1 || position [1] < 0 || position [1] >= this.dimension2) {
             return null;
         }
         
@@ -118,7 +134,7 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     }
     
     public void setEntry (Apcomplex entry, int... position) {
-        if (position.length != 2 || position [0] < 0 || position [0] >= this.dimension1 || position [1]  < 0 || position [1] >= this.dimension1 || entry == null) {
+        if (entry == null || position [0] < 0 || position [0] >= this.dimension1 || position [1]  < 0 || position [1] >= this.dimension2) {
             return;
         }
         
@@ -132,7 +148,7 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
         
         for (int row = 0; row < this.dimension1; row++) {
             for (int column = 0; column < this.dimension2; column++) {
-                if (!this.matrix.get (row).get (column).equals (matrix.matrix.get (row).get (column))) {
+                if (!(this.getEntry (row, column).equals (matrix.getEntry (row, column)))) {
                     return false;
                 }
             }
@@ -143,7 +159,41 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     
     @Override
     public String toString () {
-        return JMatrixIO.matrixToString (defaultStyle);
+        Styles defaultStyle = null;
+        
+        if (Settings.settings.get ("Style") == "Array") {
+            defaultStyle = Styles.ARRAY;
+        }
+        
+        else if (Settings.settings.get ("Style") == "List") {
+            defaultStyle = Styles.LIST;
+        }
+        
+        else if (Settings.settings.get ("Style") == "Positional") {
+            defaultStyle = Styles.POSITIONAL;
+        }
+        
+        else if (Settings.settings.get ("Style") == "Brackets") {
+            defaultStyle = Styles.BRACKETS;
+        }
+        
+        else if (Settings.settings.get ("Style") == "Braces") {
+            defaultStyle = Styles.BRACES;
+        }
+        
+        else if (Settings.settings.get ("Style") == "Parentheses") {
+            defaultStyle = Styles.PARENTHESES;
+        }
+        
+        else if (Settings.settings.get ("Style") == "Pipes") {
+            defaultStyle = Styles.PIPES;
+        }
+        
+        else if (Settings.settings.get ("Style") == "Double pipes") {
+            defaultStyle = Styles.DOUBLEPIPES;
+        }
+        
+        return JMatrixIO.matrixToString (this, defaultStyle);
     }
     
     public static ArrayList <ArrayList <Apcomplex>> generateEmptyMatrix (int dimension1, int dimension2) {
@@ -161,19 +211,39 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     }
     
     public void randomizeElements (Apint range, boolean complex) {
-        Apcomplex entry = new Apcomplex (Apfloat.ZERO, Apfloat.ZERO);
+        Apcomplex entry = Apcomplex.ZERO;
         
         if (range == null) {
-            range = maxRange;
+            range = MAX_RANGE.toRadix (10);
         }
         
         for (int row = 0; row < this.dimension1; row++) {
             for (int column = 0; column < this.dimension2; column++) {
-                entry.add (new Apcomplex ((Apint) ApfloatMath.random (maxRandomDigits).mod (range.multiply (new Apint (2)).add (Apfloat.ONE)).subtract (range)));
+                entry = entry.add (
+                    new Apcomplex (
+                        ApfloatMath.random (MAX_RANDOM_DIGITS).multiply (range.add (Apint.ONE)).truncate ()
+                    )
+                );
+                
+                if (ApintMath.random (MAX_RANDOM_DIGITS).mod (new Apint (2)).equals (Apint.ONE)) {
+                    entry = entry.negate ();
+                }
                 
                 if (complex) {
-                    entry.add (new Apcomplex ((Apint) ApfloatMath.random (maxRandomDigits).mod (range.multiply (new Apint (2)).add (Apfloat.ONE)).subtract (range)).multiply (Apcomplex.I));
-                }  
+                    entry = entry.add (
+                        new Apcomplex (
+                            Apfloat.ZERO,
+                            ApfloatMath.random (MAX_RANDOM_DIGITS).multiply (range.add (Apint.ONE)).truncate ()
+                        )
+                    );
+                    
+                    if (ApintMath.random (MAX_RANDOM_DIGITS).mod (new Apint (2)).equals (Apint.ONE)) {
+                        entry = entry.conj ();
+                    }
+                }
+                
+                this.setEntry (entry, row, column);
+                entry = Apcomplex.ZERO;
             }
         }
     }
@@ -231,39 +301,41 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
         return matrixNegate;
     }
     
+    // No sé qué es lo que pasa exactamente con esta función que no va :(
     @Override
     public ArrayList <Matrix> principalSubmatrices () {
-        if (this.matrix == null || this.dimension1 <= 1 || this.dimension2 <= 1) {
-            return null;
-        }
-        
-        ArrayList <Matrix> submatrices = new ArrayList <Matrix> ();
-        
-        HashSet <int []> deletionSets = new HashSet <int []> ();
-        
-        for (int row = 0; row < this.dimension1; row++) {
-            for (int column = 0; column < this.dimension2; column++) {
-                deletionSets.add (new int [] {row, column});
-            }
-        }
-        
-        for (int [] deletionSet : deletionSets) {
-            ArrayList <ArrayList <Apcomplex>> submatrixEntries = new ArrayList <ArrayList <Apcomplex>> ();
-            
-            for (int row = 0; row < this.dimension1; row++) {
-                if (row != deletionSet [0]) {
-                    submatrixEntries.add (this.getRow (row));
-                }
-            }
-            
-            for (int row = 0; row < submatrixEntries.size (); row++) {
-                submatrixEntries.get (row).remove (deletionSet [1]);
-            }
-            
-            submatrices.add (new Matrix (this.dimension1 - 1, this.dimension2 - 1, submatrixEntries));
-        }
-        
-        return submatrices;
+//        if (this.matrix == null || this.dimension1 <= 1 || this.dimension2 <= 1) {
+//            return null;
+//        }
+//        
+//        ArrayList <Matrix> submatrices = new ArrayList <Matrix> ();
+//        
+//        HashSet <int []> deletionSets = new HashSet <int []> ();
+//        
+//        for (int row = 0; row < this.dimension1; row++) {
+//            for (int column = 0; column < this.dimension2; column++) {
+//                deletionSets.add (new int [] {row, column});
+//            }
+//        }
+//        
+//        for (int [] deletionSet : deletionSets) {
+//            ArrayList <ArrayList <Apcomplex>> submatrixEntries = new ArrayList <ArrayList <Apcomplex>> ();
+//            
+//            for (int row = 0; row < this.dimension1; row++) {
+//                if (row != deletionSet [0]) {
+//                    submatrixEntries.add (this.getRow (row));
+//                }
+//            }
+//            
+//            for (int row = 0; row < submatrixEntries.size (); row++) {
+//                submatrixEntries.get (row).remove (deletionSet [1]);
+//            }
+//            
+//            submatrices.add (new Matrix (this.dimension1 - 1, this.dimension2 - 1, submatrixEntries));
+//        }
+//        
+//        return submatrices;
+        return null;
     }
     
     public Apcomplex modulus () {
@@ -296,13 +368,20 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
         return vector;
     }
     
+    // No sé por qué pero no va
     @Override
     public Vector columnMajorVectorization () {
-        if (this.matrix == null) {
-            return null;
-        }
-        
-        return (Vector) MatrixOps.matrixMultiplication (new CommutationMatrix (this.dimension1, this.dimension2), this.vectorization ());
+//        if (this.matrix == null) {
+//            return null;
+//        }
+//        
+//        ArrayList <ArrayList <Apcomplex>> vectorEntries = MatrixOps.matrixMultiplication (
+//            new CommutationMatrix (this.dimension1, this.dimension2),
+//            this.vectorization ()
+//        ).matrix;
+//        
+//        return new Vector (this.dimension1 * this.dimension2, vectorEntries);
+        return null;
     }
     
     @Override
@@ -311,15 +390,7 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
             return null;
         }
 
-        ArrayList <ArrayList <Apcomplex>> rowVectorEntries = generateEmptyMatrix (1, this.dimension1 * this.dimension2);
-        
-        for (int row = 0; row < this.dimension1; row++) {
-            for (int column = 0; column < this.dimension2; column++) {
-                rowVectorEntries.get (0).set (row * this.dimension2 + column, this.matrix.get (row).get (column));
-            }
-        }
-        
-        return new RowVector (this.dimension1 * this.dimension2, rowVectorEntries);
+        return this.vectorization ().toRowVector ();
     }
     
     @Override
@@ -497,7 +568,7 @@ public class Matrix implements Vectorizable, MatrixProperties, Serializable {
     public boolean isToeplitz () {
         for (int row = 0; row < this.dimension1 - 1; row++) {
             for (int column = 0; column < this.dimension2 - 1; column++) {
-                if (!this.getEntry ().equals (this.getEntry (row + 1, column + 1))) {
+                if (!this.getEntry (row, column).equals (this.getEntry (row + 1, column + 1))) {
                     return false;
                 }
             }

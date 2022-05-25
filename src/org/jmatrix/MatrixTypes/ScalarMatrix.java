@@ -9,22 +9,12 @@ public class ScalarMatrix extends SquareMatrix {
         super (dimension1);
 
         for (int entry = 0; entry < dimension1; entry++) {
-            super.setEntry (scalar, entry, entry);
+            this.setEntry (scalar, entry, entry);
         }
     }
     
     public ScalarMatrix (ScalarMatrix scalarMatrix) {
         super (scalarMatrix);
-    }
-    
-    @Override
-    public void setMatrix (ArrayList <ArrayList <Apcomplex>> matrix) {
-        return;
-    }
-    
-    @Override
-    public void setEntry (Apcomplex entry, int... position) {
-        return;
     }
     
     @Override

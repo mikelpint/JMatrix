@@ -9,7 +9,7 @@ import org.apfloat.Apint;
 import org.apfloat.ApintMath;
 
 import org.jmatrix.MatrixTypes.*;
-import org.jmatrix.internals.*;
+import org.jmatrix.internal.*;
 
 public class MatrixOps {
     public static ArrayList <Matrix> splitMatrix (Matrix matrix, int nSplits) {
@@ -252,7 +252,7 @@ public class MatrixOps {
         return matrixC;
     }
     
-    public static int calculateRank (Matrix matrix, OpList opList) {   
+    public static int calculateRank (Matrix matrix, OpList opList) {
         if (matrix instanceof ZeroMatrix || matrix.equals (new ZeroMatrix (matrix.getDimension1 (), matrix.getDimension2 ()))) {
             return 0;
         }
@@ -302,7 +302,7 @@ public class MatrixOps {
             return Apcomplex.ZERO;
         }
         
-        if (matrix instanceof PascalMatrix.SymmetricPascalMatrix) {
+        if (matrix instanceof SymmetricPascalMatrix) {
             Apint trace = Apint.ZERO;
             
             for (int k  = 0; k <= matrix.getDimension1 () - 1; k++) {
@@ -316,7 +316,7 @@ public class MatrixOps {
             return (Apcomplex) trace;
         }
         
-        if (matrix instanceof LehmerMatrix || matrix instanceof PascalMatrix.LowerPascalMatrix || matrix instanceof PascalMatrix.UpperPascalMatrix) {
+        if (matrix instanceof LehmerMatrix || matrix instanceof LowerPascalMatrix || matrix instanceof UpperPascalMatrix) {
             return new Apcomplex (new Apfloat (matrix.getDimension1 ()));
         }
         
@@ -365,7 +365,7 @@ public class MatrixOps {
                 determinantReciprocal = determinantReciprocal.multiply (JMath.binomialCoefficient (i, i / 2));
             }
             
-            return ApcomplexMath.pow ((Apcomplex) determinantReciprocal, -1);
+            return ApcomplexMath.pow ((Apcomplex) determinantReciprocal.precision (Matrix.NUMBER_PRECISION), -1);
         }
         
         if (matrix instanceof ExchangeMatrix) {
@@ -428,10 +428,10 @@ public class MatrixOps {
             
             SquareMatrix inverseMatrix = new SquareMatrix (n);
             
-            for (int row = 0; row <= n; row++) {
-                for (int column = 0; column <= n; column++) {
+            for (int row = 0; row < n; row++) {
+                for (int column = 0; column < n; column++) {
                     inverseMatrix.setEntry (
-                        (Apcomplex) ApintMath.pow (Apint.ONE.negate (), row + column + 2).multiply (
+                        (Apcomplex) ApintMath.pow (Apint.ONE.negate (), row + column + 2).precision (Matrix.NUMBER_PRECISION).multiply (
                             new Apint (row + column + 1).multiply (
                                 JMath.binomialCoefficient (n + row, n - column - 1)
                             ).multiply (

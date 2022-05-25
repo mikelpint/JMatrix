@@ -12,19 +12,9 @@ public class HilbertMatrix extends SquareMatrix {
         
         for (int row = 0; row < this.dimension1; row++) {
             for (int column = 0; column < this.dimension1; column++) {
-                super.setEntry (ApcomplexMath.pow ((Apcomplex) new Apfloat (row + column + 1), -1), row, column);
+                this.setEntry (ApcomplexMath.pow ((Apcomplex) new Apfloat (row + column + 1, 1000), -1), row, column);
             }
         }
-    }
-    
-    @Override
-    public void setMatrix (ArrayList <ArrayList <Apcomplex>> matrix) {
-        return;
-    }
-    
-    @Override
-    public void setEntry (Apcomplex entry, int... position) {
-        return;
     }
     
     @Override

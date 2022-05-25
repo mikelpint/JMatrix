@@ -85,34 +85,6 @@ public abstract class PauliMatrix extends SquareMatrix {
         super (pauliMatrix);
     }
     
-    final public class X extends PauliMatrix {
-        public X () {
-            super (Types.X);
-        }
-    }
-    
-    final public class Y extends PauliMatrix {
-        public Y () {
-            super (Types.Z);
-        }
-    }
-    
-    final public class Z extends PauliMatrix {
-        public Z () {
-            super (Types.Z);
-        }
-    }
-    
-    @Override
-    public void setMatrix (ArrayList <ArrayList <Apcomplex>> matrix) {
-        return;
-    }
-    
-    @Override
-    public void setEntry (Apcomplex entry, int... position) {
-        return;
-    }
-    
     @Override
     public boolean isHermitian () {
         return true;

@@ -2,7 +2,7 @@ package org.jmatrix.MatrixTypes;
 
 import org.apfloat.Apcomplex;
 
-final public class IdentityMatrix extends ScalarMatrix {
+public final class IdentityMatrix extends ScalarMatrix {
     public IdentityMatrix (int dimension1) {
         super (dimension1, Apcomplex.ONE);
     }
@@ -19,5 +19,10 @@ final public class IdentityMatrix extends ScalarMatrix {
     @Override
     public boolean isIdempotent () {
         return true;
+    }
+    
+    @Override
+    public boolean isHollow () {
+        return false;
     }
 }
