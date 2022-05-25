@@ -1,4 +1,4 @@
-# JMatrix: proyecto de programac
+# JMatrix: proyecto de Programación II de Mikel Pintado
 
 ## Disclaimer
 Debido a la falta de tiempo este proyecto está bastante incompleto (habré hecho un 10% de las cosas que quería hacer) y tiene una cantidad exagerada de bugs que tienen que ver con NullPointerExceptions y con operaciones con números de precisión infinita de la biblioteca Apfloat.
