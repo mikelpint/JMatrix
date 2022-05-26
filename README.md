@@ -21,7 +21,22 @@ Pulsar el botón de generar una matriz le abre al usuario un diálogo que le pid
 
 Después de seleccionar el tipo de matriz a generar te preguntará si quieres guardarla en un archivo.
 
-Después de eso te imprimirá una lista de las propiedades de la matriz, además de la propia matriz. Puedes cambiar cómo se ve la matriz yendo a la ventana principal y pulsando el botón "Style" del menú "Settings".
+Después de eso te imprimirá una lista de las propiedades de la matriz, además de la propia matriz. Puedes cambiar cómo se ve la matriz yendo a la ventana principal y pulsando el botón "Style" del menú "Settings" pero el estilo por defecto será el equivalente a una Bmatrix de LaTex.
+
+## Capturas del funcionamiento
+Las siguientes capturas muestran el funcionamiento del programa generando una matriz identidad de orden 4.
+
+### Ventana principal
+![Ventana principal](img/Main%20Window.png)
+
+### Seleccionar estilo de visualización de las matrices
+![Diálogo de selección de estilo](img/Styles.png)
+
+### Seleccionar la matriz a generar
+![Diálogo de selección de filas de la matriz](img/Rows.png)
+
+### Visualización de las propiedades de las matrices
+![Cuadro de texto con las propiedades de las matrices](img/Matrix%20Properties.png)
 
 ## Diagrama de clases
-Puedes consultar el diagrama de clases [en este mismo repositorio](Diagrama%20de%20clases.svg)
+Puedes consultar el diagrama de clases [en este mismo repositorio](img/Diagrama%20de%20clases.svg)
