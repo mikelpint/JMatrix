@@ -24,4 +24,4 @@ Después de seleccionar el tipo de matriz a generar te preguntará si quieres gu
 Después de eso te imprimirá una lista de las propiedades de la matriz, además de la propia matriz. Puedes cambiar cómo se ve la matriz yendo a la ventana principal y pulsando el botón "Style" del menú "Settings".
 
 ## Diagrama de clases
-Puedes consultar el diagrama de clases en este mismo repositorio.
+Puedes consultar el diagrama de clases [en este mismo repositorio](Diagrama%20de%20clases.svg)
